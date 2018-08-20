@@ -5,19 +5,20 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
-Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
-  config.vm.define "jenkins" do |jenkins|
-  jenkins.vm.box = "centos/7"
-  jenkins.vm.provider "virtualbox" do |vb|
-    vb.memory = 2048
-    end
-    jenkins.vm.provision "shell", path: "vagrant_scripts/python_server"
+require 'yaml'
+machines = YAML.load_file('config.yaml')
+
+Vagrant.configure("2") do |config|
+  
+  machines.each do |machine| 
+    config.vm.define machine['name'] do |guest_vm|
+      guest_vm.vm.box = "centos/7"
+      guest_vm.vm.provider "virtualbox" do |vb|
+        vb.memory = machine['memory']
+      end
+    guest_vm.vm.provision "shell", path: "vagrant_scripts/python_server"
+    end  
   end
 
   # Disable automatic box update checking. If you disable this, then
@@ -29,7 +30,7 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-   config.vm.network "forwarded_port", guest: 9000, host: 8080
+  # config.vm.network "forwarded_port", guest: 9000, host: 8080
 
 
   # Create a forwarded port mapping which allows access to a specific port
