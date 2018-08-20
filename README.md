@@ -7,7 +7,10 @@
 	- git clones the python-systemd-http-server
 	- installs python-systemd-http-server via running the make install command
 	- uses systemctl to run and enable services
-	
+
+## Build
+vagrant up
+
 ## Run 
 
 localhost:8080
