@@ -1,26 +1,21 @@
+# used to create vm in vagrant, below is an array of the data to each vm
 ---
+# one array
 - name: jenkins
   box: centos/7
   cpus: 1
-  memory: 4096
-  private_ip: 10.0.10.10
-  packages_manager: yum
-  packages:
-  - wget 
-  - unzip
-  - git
+  memory: 2048
+  guest_port: 9000
+  host_port: 8080
   scripts:
-    startup
+  # the scripts i want to run on creation to array
+    - python_server
+
+# new vm
 - name: server
   box: centos/7
   cpus: 1
   memory: 1024
-  private_ip: 10.0.10.11
-  packages_manager: yum
-  packages:
-  - wget
-  - unzip
-  - git
-  scripts:
-    startup
+  guest_port: 9000
+  host_port: 8081
 ...

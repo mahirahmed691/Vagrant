@@ -1,78 +1,44 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
-
+# importing yaml
 require 'yaml'
-machines = YAML.load_file('config.yaml')
+# making variable machine and to take input from a yaml file
+machines = YAML.load_file("config.yaml")
 
 Vagrant.configure("2") do |config|
-  
-  machines.each do |machine| 
-    config.vm.define machine['name'] do |guest_vm|
-      guest_vm.vm.box = "centos/7"
-      guest_vm.vm.provider "virtualbox" do |vb|
-        vb.memory = machine['memory']
-      end
-    guest_vm.vm.provision "shell", path: "vagrant_scripts/python_server"
-    end  
-  end
+	# for all entry in the yaml file refer to that data as machine
+	machines.each do |machine|
+		# running the following procedure for each instance
+		config.vm.define machine['name'] do |machine_vm|
+			# calling a defined method for the creation of each vm 
+			# and installing scripts
+			set_details(machine, machine_vm)
+			install_scripts(machine, machine_vm)
+		end
+	end
+end
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+# creating a method for basic setup, ie
+# name of the vm 
+# os 
+# memory 
+# cpus
+def set_details(machine, machine_vm)
+	machine_vm.vm.box = machine['box']
+	machine_vm.vm.provider "virtualbox" do |vb|
+		vb.cpus = machine['cpus']
+		vb.memory = machine['memory']
+	end
+	machine_vm.vm.network "forwarded_port", guest: machine['guest_port'], host: machine['host_port'], host_ip: "127.0.0.1"
+end
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 9000, host: 8080
-
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine and only allow access
-  # via 127.0.0.1 to disable public access
-  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  #config.vm.network "private_network", ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
+# creating a script to see if any scripts need to be run,
+# checking if it is not nil and then running it
+def install_scripts(machine, machine_vm)
+	unless machine['scripts'].nil?
+		machine['scripts'].each do |script|
+			machine_vm.vm.provision "shell", privileged: false, path: "vagrant_scripts/#{script}"
+		end
+	end
 end
