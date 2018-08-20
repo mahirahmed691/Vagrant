@@ -9,8 +9,8 @@
 	- uses systemctl to run and enable services
 
 ## Build
-vagrant up
+```vagrant up```
 
 ## Run 
 
-localhost:8080
+```localhost:8080```
