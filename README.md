@@ -3,7 +3,7 @@
 ## About this repo
 - This repo is configured to deploy a Vagrant vm running centos-7
 - The Vagrantfile is configured so that it will run a script that 
-	- install gits
+	- installs gits via the yum package 
 	- git clones the python-systemd-http-server
-	- install python-systemd-http-server via running the make install command
-	- use systemctl to run and enable services
+	- installs python-systemd-http-server via running the make install command
+	- uses systemctl to run and enable services
