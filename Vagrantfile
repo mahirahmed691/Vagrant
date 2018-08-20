@@ -12,19 +12,13 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "centos/7"
-  config.vm.provider "virtualbox" do |vb|
+  config.vm.define "jenkins" do |jenkins|
+  jenkins.vm.box = "centos/7"
+  jenkins.vm.provider "virtualbox" do |vb|
     vb.memory = 2048
+    end
+    jenkins.vm.provision "shell", path: "vagrant_scripts/python_server"
   end
-
-  config.vm.provision "shell", inline: <<-SHELL
-      sudo yum install -y git
-      sudo useradd jenkins
-      git clone https://github.com/mahirahmed691/python-systemd-http-server.git && cd python-systemd-http-server
-      sudo make install
-      sudo systemctl enable python-systemd-http-server
-      sudo systemctl start python-systemd-http-server
-  SHELL
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
